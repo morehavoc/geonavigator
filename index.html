@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>GeoNavigator - Coordinate Collection Mission</title>
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             font-family: 'Courier New', monospace;
             display: flex;
@@ -15,28 +15,38 @@
             align-items: center;
             min-height: 100vh;
             color: white;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .game-container {
             background: rgba(0, 0, 0, 0.8);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: none;
+            max-width: 100vw;
+            box-sizing: border-box;
         }
 
         .intro-screen {
             background: rgba(0, 0, 0, 0.9);
             border-radius: 15px;
-            padding: 40px;
+            padding: 25px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
             text-align: center;
-            max-width: 600px;
+            max-width: 90vw;
             border: 3px solid #00ff88;
+            box-sizing: border-box;
         }
 
         .intro-title {
-            font-size: 3.5em;
+            font-size: clamp(2em, 8vw, 3.5em);
             margin: 0 0 10px 0;
             background: linear-gradient(45deg, #00ff88, #00aaff, #ff6b6b);
             -webkit-background-clip: text;
@@ -45,80 +55,8 @@
             text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
 
-        .intro-subtitle {
-            font-size: 1.3em;
-            margin: 0 0 30px 0;
-            color: #aaa;
-        }
-
-        .intro-description {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin: 20px 0;
-            color: #ccc;
-        }
-
-        .intro-characters {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .character {
-            text-align: center;
-            flex: 1;
-        }
-
-        .character-icon {
-            font-size: 2.5em;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .character-name {
-            font-size: 0.9em;
-            color: #888;
-        }
-
-        .start-button {
-            background: linear-gradient(45deg, #00ff88, #00aaff);
-            border: none;
-            padding: 15px 40px;
-            margin: 20px;
-            border-radius: 8px;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.3em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .start-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
-        }
-
-        .intro-instructions {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 0.95em;
-            color: #bbb;
-        }
-
-        .game-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
         .game-title {
-            font-size: 2.5em;
+            font-size: clamp(1.5em, 6vw, 2.5em);
             margin: 0;
             background: linear-gradient(45deg, #00ff88, #00aaff);
             -webkit-background-clip: text;
@@ -126,24 +64,92 @@
             background-clip: text;
         }
 
-        .game-subtitle {
-            font-size: 1em;
+        .intro-subtitle, .game-subtitle {
+            font-size: clamp(0.9em, 3vw, 1.3em);
             margin: 5px 0;
             color: #aaa;
+        }
+
+        .intro-description {
+            font-size: clamp(0.9em, 3vw, 1.1em);
+            line-height: 1.6;
+            margin: 20px 0;
+            color: #ccc;
+        }
+
+        .intro-characters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .character {
+            text-align: center;
+        }
+
+        .character-icon {
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .character-name {
+            font-size: clamp(0.7em, 2.5vw, 0.9em);
+            color: #888;
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            border: none;
+            padding: 15px 30px;
+            margin: 15px 5px;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: clamp(1em, 4vw, 1.3em);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            min-height: 50px;
+        }
+
+        .start-button:hover, .start-button:active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
+        }
+
+        .intro-instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: clamp(0.8em, 2.5vw, 0.95em);
+            color: #bbb;
+            text-align: left;
         }
 
         .game-stats {
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
             margin-bottom: 15px;
-            font-size: 1.2em;
+            font-size: clamp(0.9em, 3vw, 1.2em);
             font-weight: bold;
+            gap: 10px;
         }
 
         .stat {
-            padding: 5px 15px;
+            padding: 8px 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
         }
 
         #gameCanvas {
@@ -152,56 +158,151 @@
             background: #000;
             display: block;
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            max-width: 100vw;
+            max-height: 60vh;
+            width: auto;
+            height: auto;
         }
 
         .controls {
             text-align: center;
             margin-top: 15px;
-            font-size: 0.9em;
+            font-size: clamp(0.8em, 2.5vw, 0.9em);
             color: #ccc;
         }
 
-        .game-over {
-            position: absolute;
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .control-pad {
+            display: inline-grid;
+            grid-template-areas: 
+                ". up ."
+                "left center right"
+                ". down .";
+            gap: 10px;
+            margin: 20px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            border: none;
+            border-radius: 12px;
+            color: black;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:active {
+            transform: scale(0.9);
+            background: linear-gradient(45deg, #00cc66, #0088cc);
+        }
+
+        .control-btn.up { grid-area: up; }
+        .control-btn.down { grid-area: down; }
+        .control-btn.left { grid-area: left; }
+        .control-btn.right { grid-area: right; }
+
+        .game-over, .game-win {
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 25px;
             border-radius: 10px;
             text-align: center;
-            border: 2px solid #ff4444;
             display: none;
+            max-width: 90vw;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+
+        .game-over {
+            border: 2px solid #ff4444;
         }
 
         .game-win {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
             border: 2px solid #00ff88;
-            display: none;
         }
 
         button {
             background: linear-gradient(45deg, #00ff88, #00aaff);
             border: none;
-            padding: 10px 20px;
-            margin: 10px;
+            padding: 12px 20px;
+            margin: 8px;
             border-radius: 5px;
             color: black;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1em;
+            font-size: clamp(0.9em, 3vw, 1em);
+            min-height: 44px;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
+        button:hover, button:active {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .mobile-controls {
+                display: block;
+            }
+
+            .controls {
+                display: none;
+            }
+
+            #gameCanvas {
+                max-height: 50vh;
+            }
+
+            .game-container {
+                padding: 10px;
+            }
+
+            .intro-screen {
+                padding: 20px;
+            }
+
+            .control-pad {
+                margin: 15px;
+            }
+
+            .intro-characters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .stat {
+                font-size: 0.8em;
+                padding: 6px 8px;
+            }
         }
     </style>
 </head>
@@ -236,7 +337,7 @@
         </div>
 
         <div class="intro-instructions">
-            <strong>🎮 Controls:</strong> Use arrow keys (⬆️⬇️⬅️➡️) to navigate<br>
+            <strong>🎮 Controls:</strong> Use arrow keys ⬆️⬇️⬅️➡️ (desktop) or tap direction buttons / swipe (mobile)<br>
             <strong>🎯 Objective:</strong> Collect all 📍 location pins to complete the mission<br>
             <strong>⚡ Power-ups:</strong> Grab 🎯 survey markers to temporarily disable satellites<br>
             <strong>🛰️ Satellites:</strong> Each has unique behavior - learn their patterns!
@@ -264,6 +365,18 @@
             Collect 📍 location pins and avoid the 🛰️ satellites!<br>
             <small>Red=Chaser, Pink=Patrol, Blue=Ambush, Orange=Shy</small>
         </div>
+
+        <div class="mobile-controls">
+            <div class="control-pad">
+                <button class="control-btn up" data-direction="up">⬆️</button>
+                <button class="control-btn left" data-direction="left">⬅️</button>
+                <button class="control-btn right" data-direction="right">➡️</button>
+                <button class="control-btn down" data-direction="down">⬇️</button>
+            </div>
+            <div style="font-size: 0.9em; color: #ccc;">
+                Tap direction buttons to move • Swipe to change direction
+            </div>
+        </div>
     </div>
 
     <div class="game-over" id="gameOver">
@@ -286,15 +399,62 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Game constants
-        const CELL_SIZE = 30;
-        const ROWS = 20;
-        const COLS = 20;
-        const PLAYER_SIZE = 20;
-        const GHOST_SIZE = 18;
-        const DOT_SIZE = 6;
-        const POWER_PELLET_SIZE = 12;
+        // Make canvas responsive
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const maxWidth = Math.min(600, window.innerWidth - 40);
+            const maxHeight = Math.min(600, window.innerHeight * 0.6);
+            const size = Math.min(maxWidth, maxHeight);
+            
+            canvas.width = size;
+            canvas.height = size;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+        }
+
+        // Call resize on load and window resize
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resizeCanvas, 100);
+        });
+
+        // Prevent scrolling and zooming on mobile
+        document.addEventListener('touchmove', (e) => {
+            if (e.target === canvas || e.target.classList.contains('control-btn')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('gesturestart', (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener('gesturechange', (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener('gestureend', (e) => {
+            e.preventDefault();
+        });
+        
+        // Game constants - will be set based on canvas size
+        let CELL_SIZE = 30;
+        let ROWS = 20;
+        let COLS = 20;
+        let PLAYER_SIZE = 20;
+        let GHOST_SIZE = 18;
+        let DOT_SIZE = 6;
+        let POWER_PELLET_SIZE = 12;
         const MOVE_SPEED = 12; // Frames for one grid move (higher = slower but smoother)
+
+        function updateGameConstants() {
+            const canvasSize = Math.min(canvas.width, canvas.height);
+            CELL_SIZE = Math.floor(canvasSize / 20);
+            PLAYER_SIZE = Math.floor(CELL_SIZE * 0.7);
+            GHOST_SIZE = Math.floor(CELL_SIZE * 0.6);
+            DOT_SIZE = Math.floor(CELL_SIZE * 0.2);
+            POWER_PELLET_SIZE = Math.floor(CELL_SIZE * 0.4);
+        }
 
         // Game state
         let gameRunning = true;
@@ -428,6 +588,7 @@
         // Input handling
         let inputDirection = { x: 0, y: 0 };
         
+        // Keyboard controls
         document.addEventListener('keydown', (e) => {
             switch(e.key) {
                 case 'ArrowUp':
@@ -448,6 +609,82 @@
                     break;
             }
         });
+
+        // Mobile touch controls
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const minSwipeDistance = 30;
+
+        // Virtual button controls
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const direction = btn.dataset.direction;
+                handleDirectionInput(direction);
+            });
+            
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const direction = btn.dataset.direction;
+                handleDirectionInput(direction);
+            });
+        });
+
+        function handleDirectionInput(direction) {
+            switch(direction) {
+                case 'up':
+                    inputDirection = { x: 0, y: -1 };
+                    break;
+                case 'down':
+                    inputDirection = { x: 0, y: 1 };
+                    break;
+                case 'left':
+                    inputDirection = { x: -1, y: 0 };
+                    break;
+                case 'right':
+                    inputDirection = { x: 1, y: 0 };
+                    break;
+            }
+        }
+
+        // Swipe gesture detection
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (!e.changedTouches[0]) return;
+            
+            const touch = e.changedTouches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            
+            const absDeltaX = Math.abs(deltaX);
+            const absDeltaY = Math.abs(deltaY);
+            
+            if (Math.max(absDeltaX, absDeltaY) > minSwipeDistance) {
+                if (absDeltaX > absDeltaY) {
+                    // Horizontal swipe
+                    inputDirection = deltaX > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
+                } else {
+                    // Vertical swipe
+                    inputDirection = deltaY > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
+                }
+            }
+        }, { passive: false });
+
+        // Prevent zoom on double tap
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
         function isValidMove(gridX, gridY) {
             // Handle tunnel effect
@@ -884,6 +1121,8 @@
         }
 
         function startMission() {
+            resizeCanvas();
+            updateGameConstants();
             document.getElementById('introScreen').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'block';
             startNewGame();
@@ -942,6 +1181,7 @@
             document.getElementById('gameOver').style.display = 'none';
             document.getElementById('gameWin').style.display = 'none';
             document.getElementById('introScreen').style.display = 'block';
+            resizeCanvas();
         }
 
         // Game loop
@@ -973,6 +1213,12 @@
                 requestAnimationFrame(gameLoop);
             }
         }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            updateGameConstants();
+        });
     </script>
 </body>
 </html>
