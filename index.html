@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoNavigator - Coordinate Collection Mission</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .intro-screen {
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            max-width: 600px;
+            border: 3px solid #00ff88;
+        }
+
+        .intro-title {
+            font-size: 3.5em;
+            margin: 0 0 10px 0;
+            background: linear-gradient(45deg, #00ff88, #00aaff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .intro-subtitle {
+            font-size: 1.3em;
+            margin: 0 0 30px 0;
+            color: #aaa;
+        }
+
+        .intro-description {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 20px 0;
+            color: #ccc;
+        }
+
+        .intro-characters {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .character {
+            text-align: center;
+            flex: 1;
+        }
+
+        .character-icon {
+            font-size: 2.5em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .character-name {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .start-button {
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            border: none;
+            padding: 15px 40px;
+            margin: 20px;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.6);
+        }
+
+        .intro-instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.95em;
+            color: #bbb;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 2.5em;
+            margin: 0;
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-subtitle {
+            font-size: 1em;
+            margin: 5px 0;
+            color: #aaa;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .stat {
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        #gameCanvas {
+            border: 3px solid #00ff88;
+            border-radius: 8px;
+            background: #000;
+            display: block;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #ff4444;
+            display: none;
+        }
+
+        .game-win {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #00ff88;
+            display: none;
+        }
+
+        button {
+            background: linear-gradient(45deg, #00ff88, #00aaff);
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-screen" id="introScreen">
+        <h1 class="intro-title">🌍 GEONAVIGATOR</h1>
+        <p class="intro-subtitle">Coordinate Collection Mission</p>
+        
+        <div class="intro-description">
+            Navigate the geographic coordinate grid as Earth's digital navigator! 
+            Your mission: collect all location data points while avoiding rogue satellites 
+            that threaten to disrupt your navigation systems.
+        </div>
+
+        <div class="intro-characters">
+            <div class="character">
+                <span class="character-icon">🌍</span>
+                <div class="character-name">Navigator<br>(You)</div>
+            </div>
+            <div class="character">
+                <span class="character-icon">🛰️</span>
+                <div class="character-name">Satellites<br>(Avoid!)</div>
+            </div>
+            <div class="character">
+                <span class="character-icon">📍</span>
+                <div class="character-name">Data Points<br>(Collect)</div>
+            </div>
+            <div class="character">
+                <span class="character-icon">🎯</span>
+                <div class="character-name">Survey Markers<br>(Power-ups)</div>
+            </div>
+        </div>
+
+        <div class="intro-instructions">
+            <strong>🎮 Controls:</strong> Use arrow keys (⬆️⬇️⬅️➡️) to navigate<br>
+            <strong>🎯 Objective:</strong> Collect all 📍 location pins to complete the mission<br>
+            <strong>⚡ Power-ups:</strong> Grab 🎯 survey markers to temporarily disable satellites<br>
+            <strong>🛰️ Satellites:</strong> Each has unique behavior - learn their patterns!
+        </div>
+
+        <button class="start-button" onclick="startMission()">🚀 Start Mission</button>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="game-header">
+            <h1 class="game-title">🌍 GEONAVIGATOR</h1>
+            <p class="game-subtitle">Coordinate Collection Mission Active</p>
+        </div>
+        
+        <div class="game-stats">
+            <div class="stat">📊 Score: <span id="score">0</span></div>
+            <div class="stat">❤️ Lives: <span id="lives">3</span></div>
+            <div class="stat">📍 Pins: <span id="dots">0</span></div>
+        </div>
+        
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        
+        <div class="controls">
+            Use ⬆️⬇️⬅️➡️ arrow keys to navigate the globe around the coordinate grid!<br>
+            Collect 📍 location pins and avoid the 🛰️ satellites!<br>
+            <small>Red=Chaser, Pink=Patrol, Blue=Ambush, Orange=Shy</small>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2 style="color: #ff4444;">🛰️ MISSION FAILED!</h2>
+        <p>Your navigation system was compromised by rogue satellites!</p>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <button onclick="startNewGame()">🔄 Try Again</button>
+        <button onclick="returnToMenu()">🏠 Main Menu</button>
+    </div>
+
+    <div class="game-win" id="gameWin">
+        <h2 style="color: #00ff88;">🎯 MISSION COMPLETE!</h2>
+        <p>All coordinate data successfully collected!</p>
+        <p>Final Score: <span id="winScore">0</span></p>
+        <button onclick="startNewGame()">🌍 New Mission</button>
+        <button onclick="returnToMenu()">🏠 Main Menu</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game constants
+        const CELL_SIZE = 30;
+        const ROWS = 20;
+        const COLS = 20;
+        const PLAYER_SIZE = 20;
+        const GHOST_SIZE = 18;
+        const DOT_SIZE = 6;
+        const POWER_PELLET_SIZE = 12;
+        const MOVE_SPEED = 12; // Frames for one grid move (higher = slower but smoother)
+
+        // Game state
+        let gameRunning = true;
+        let score = 0;
+        let lives = 3;
+        let dotsCollected = 0;
+        let totalDots = 0;
+        let powerMode = false;
+        let powerModeTimer = 0;
+        let frameCount = 0;
+
+        // Maze layout (1 = wall, 0 = path, 2 = dot, 3 = power pellet)
+        const maze = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+            [1,3,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,3,1],
+            [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+            [1,2,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,2,1],
+            [1,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,1],
+            [1,1,1,1,2,1,1,1,0,1,1,0,1,1,1,2,1,1,1,1],
+            [1,1,1,1,2,1,0,0,0,0,0,0,0,0,1,2,1,1,1,1],
+            [1,1,1,1,2,1,0,1,0,0,0,0,1,0,1,2,1,1,1,1],
+            [0,0,0,0,2,0,0,1,0,0,0,0,1,0,0,2,0,0,0,0],
+            [1,1,1,1,2,1,0,1,0,0,0,0,1,0,1,2,1,1,1,1],
+            [1,1,1,1,2,1,0,0,0,0,0,0,0,0,1,2,1,1,1,1],
+            [1,1,1,1,2,1,1,1,0,1,1,0,1,1,1,2,1,1,1,1],
+            [1,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,1],
+            [1,2,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,2,1],
+            [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+            [1,3,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,3,1],
+            [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+            [1,2,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,2,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        // Count total dots
+        for (let row of maze) {
+            for (let cell of row) {
+                if (cell === 2) totalDots++;
+            }
+        }
+
+        // Player object
+        const player = {
+            gridX: 9,
+            gridY: 15,
+            x: 9 * CELL_SIZE,
+            y: 15 * CELL_SIZE,
+            direction: { x: 0, y: 0 },
+            nextDirection: { x: 0, y: 0 },
+            moving: false,
+            moveProgress: 0,
+            startX: 9 * CELL_SIZE,
+            startY: 15 * CELL_SIZE,
+            targetX: 9 * CELL_SIZE,
+            targetY: 15 * CELL_SIZE
+        };
+
+        // Ghost objects with different behaviors
+        const ghosts = [
+            { 
+                gridX: 9, gridY: 9, 
+                x: 9 * CELL_SIZE, y: 9 * CELL_SIZE,
+                direction: { x: 1, y: 0 }, 
+                color: '#ff4444', 
+                mode: 'chase', 
+                emoji: '🛰️',
+                moving: false,
+                moveProgress: 0,
+                moveTimer: 0,
+                startX: 9 * CELL_SIZE,
+                startY: 9 * CELL_SIZE,
+                targetX: 9 * CELL_SIZE,
+                targetY: 9 * CELL_SIZE,
+                commitTimer: 0,
+                lastDirection: { x: 1, y: 0 }
+            },
+            { 
+                gridX: 10, gridY: 9, 
+                x: 10 * CELL_SIZE, y: 9 * CELL_SIZE,
+                direction: { x: -1, y: 0 }, 
+                color: '#ff69b4', 
+                mode: 'patrol', 
+                emoji: '🛰️',
+                moving: false,
+                moveProgress: 0,
+                moveTimer: 0,
+                startX: 10 * CELL_SIZE,
+                startY: 9 * CELL_SIZE,
+                targetX: 10 * CELL_SIZE,
+                targetY: 9 * CELL_SIZE,
+                commitTimer: 0,
+                lastDirection: { x: -1, y: 0 }
+            },
+            { 
+                gridX: 9, gridY: 10, 
+                x: 9 * CELL_SIZE, y: 10 * CELL_SIZE,
+                direction: { x: 0, y: 1 }, 
+                color: '#00aaff', 
+                mode: 'ambush', 
+                emoji: '🛰️',
+                moving: false,
+                moveProgress: 0,
+                moveTimer: 0,
+                startX: 9 * CELL_SIZE,
+                startY: 10 * CELL_SIZE,
+                targetX: 9 * CELL_SIZE,
+                targetY: 10 * CELL_SIZE,
+                commitTimer: 0,
+                lastDirection: { x: 0, y: 1 }
+            },
+            { 
+                gridX: 10, gridY: 10, 
+                x: 10 * CELL_SIZE, y: 10 * CELL_SIZE,
+                direction: { x: 0, y: -1 }, 
+                color: '#ffa500', 
+                mode: 'shy', 
+                emoji: '🛰️',
+                moving: false,
+                moveProgress: 0,
+                moveTimer: 0,
+                startX: 10 * CELL_SIZE,
+                startY: 10 * CELL_SIZE,
+                targetX: 10 * CELL_SIZE,
+                targetY: 10 * CELL_SIZE,
+                commitTimer: 0,
+                lastDirection: { x: 0, y: -1 }
+            }
+        ];
+
+        // Input handling
+        let inputDirection = { x: 0, y: 0 };
+        
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                    inputDirection = { x: 0, y: -1 };
+                    e.preventDefault();
+                    break;
+                case 'ArrowDown':
+                    inputDirection = { x: 0, y: 1 };
+                    e.preventDefault();
+                    break;
+                case 'ArrowLeft':
+                    inputDirection = { x: -1, y: 0 };
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                    inputDirection = { x: 1, y: 0 };
+                    e.preventDefault();
+                    break;
+            }
+        });
+
+        function isValidMove(gridX, gridY) {
+            // Handle tunnel effect
+            if (gridX < 0) gridX = COLS - 1;
+            if (gridX >= COLS) gridX = 0;
+            if (gridY < 0 || gridY >= ROWS) return false;
+            
+            return maze[gridY][gridX] !== 1;
+        }
+
+        function updatePlayer() {
+            // Only start new moves on specific frames for timed movement
+            if (frameCount % MOVE_SPEED === 0) {
+                if (!player.moving) {
+                    // Try to change direction if input received
+                    if (inputDirection.x !== 0 || inputDirection.y !== 0) {
+                        const nextGridX = player.gridX + inputDirection.x;
+                        const nextGridY = player.gridY + inputDirection.y;
+                        
+                        if (isValidMove(nextGridX, nextGridY)) {
+                            player.direction = { ...inputDirection };
+                            player.moving = true;
+                            player.moveProgress = 0;
+                            // Store start and target positions
+                            player.startX = player.gridX * CELL_SIZE;
+                            player.startY = player.gridY * CELL_SIZE;
+                            // Handle tunnel effect for target calculation
+                            let targetGridX = nextGridX;
+                            if (targetGridX < 0) targetGridX = COLS - 1;
+                            if (targetGridX >= COLS) targetGridX = 0;
+                            player.targetX = targetGridX * CELL_SIZE;
+                            player.targetY = nextGridY * CELL_SIZE;
+                        }
+                    }
+                    
+                    // If no direction change, continue in current direction
+                    if (!player.moving && (player.direction.x !== 0 || player.direction.y !== 0)) {
+                        const nextGridX = player.gridX + player.direction.x;
+                        const nextGridY = player.gridY + player.direction.y;
+                        
+                        if (isValidMove(nextGridX, nextGridY)) {
+                            player.moving = true;
+                            player.moveProgress = 0;
+                            // Store start and target positions
+                            player.startX = player.gridX * CELL_SIZE;
+                            player.startY = player.gridY * CELL_SIZE;
+                            // Handle tunnel effect for target calculation
+                            let targetGridX = nextGridX;
+                            if (targetGridX < 0) targetGridX = COLS - 1;
+                            if (targetGridX >= COLS) targetGridX = 0;
+                            player.targetX = targetGridX * CELL_SIZE;
+                            player.targetY = nextGridY * CELL_SIZE;
+                        } else {
+                            // Stop if can't continue
+                            player.direction = { x: 0, y: 0 };
+                        }
+                    }
+                }
+            }
+
+            // Always update animation for smooth movement
+            if (player.moving) {
+                player.moveProgress += 1;
+                
+                if (player.moveProgress >= MOVE_SPEED) {
+                    // Complete the move - update grid position
+                    player.gridX += player.direction.x;
+                    player.gridY += player.direction.y;
+                    
+                    // Handle tunnel effect
+                    if (player.gridX < 0) player.gridX = COLS - 1;
+                    if (player.gridX >= COLS) player.gridX = 0;
+                    
+                    // Set final position
+                    player.x = player.gridX * CELL_SIZE;
+                    player.y = player.gridY * CELL_SIZE;
+                    player.moving = false;
+                    player.moveProgress = 0;
+
+                    // Collect dots
+                    if (maze[player.gridY][player.gridX] === 2) {
+                        maze[player.gridY][player.gridX] = 0;
+                        score += 10;
+                        dotsCollected++;
+                    } else if (maze[player.gridY][player.gridX] === 3) {
+                        maze[player.gridY][player.gridX] = 0;
+                        score += 50;
+                        powerMode = true;
+                        powerModeTimer = 300; // 5 seconds at 60fps
+                    }
+                } else {
+                    // Smooth interpolation using stored start and target positions
+                    const progress = player.moveProgress / MOVE_SPEED;
+                    const easedProgress = 0.5 * (1 - Math.cos(progress * Math.PI)); // Smooth sine ease
+                    
+                    player.x = player.startX + (player.targetX - player.startX) * easedProgress;
+                    player.y = player.startY + (player.targetY - player.startY) * easedProgress;
+                }
+            }
+        }
+
+        function updateGhosts() {
+            ghosts.forEach((ghost, index) => {
+                ghost.moveTimer++;
+                ghost.commitTimer++;
+                
+                // Start new moves on specific frames (ghosts move slightly slower than player)
+                if (ghost.moveTimer >= MOVE_SPEED + 2) {
+                    ghost.moveTimer = 0;
+                    
+                    if (!ghost.moving) {
+                        const possibleMoves = [
+                            { x: 0, y: -1 }, // up
+                            { x: 0, y: 1 },  // down
+                            { x: -1, y: 0 }, // left
+                            { x: 1, y: 0 }   // right
+                        ].filter(dir => {
+                            const newGridX = ghost.gridX + dir.x;
+                            const newGridY = ghost.gridY + dir.y;
+                            return isValidMove(newGridX, newGridY);
+                        });
+
+                        if (possibleMoves.length === 0) return;
+
+                        let nextMove;
+
+                        if (powerMode) {
+                            // Run away from player - choose direction that maximizes distance
+                            const playerDist = (dir) => {
+                                const newGridX = ghost.gridX + dir.x;
+                                const newGridY = ghost.gridY + dir.y;
+                                return Math.abs(newGridX - player.gridX) + Math.abs(newGridY - player.gridY);
+                            };
+                            nextMove = possibleMoves.reduce((best, current) => 
+                                playerDist(current) > playerDist(best) ? current : best
+                            );
+                        } else {
+                            // Only change direction if forced (hit wall) or commitment time is up
+                            const canContinue = possibleMoves.find(dir => 
+                                dir.x === ghost.lastDirection.x && dir.y === ghost.lastDirection.y
+                            );
+                            
+                            if (canContinue && ghost.commitTimer < 8) {
+                                // Continue in same direction if possible and not time to reconsider
+                                nextMove = ghost.lastDirection;
+                            } else {
+                                // Time to make a new decision or forced to turn
+                                ghost.commitTimer = 0;
+                                
+                                // Remove reverse direction to prevent bobbing (unless it's the only option)
+                                const reverseX = -ghost.lastDirection.x;
+                                const reverseY = -ghost.lastDirection.y;
+                                const nonReverseMoves = possibleMoves.filter(dir => 
+                                    !(dir.x === reverseX && dir.y === reverseY)
+                                );
+                                const movesToConsider = nonReverseMoves.length > 0 ? nonReverseMoves : possibleMoves;
+
+                                switch (ghost.mode) {
+                                    case 'chase':
+                                        // Direct chase - move toward player's current position
+                                        const playerDist = (dir) => {
+                                            const newGridX = ghost.gridX + dir.x;
+                                            const newGridY = ghost.gridY + dir.y;
+                                            return Math.abs(newGridX - player.gridX) + Math.abs(newGridY - player.gridY);
+                                        };
+                                        nextMove = movesToConsider.reduce((best, current) => 
+                                            playerDist(current) < playerDist(best) ? current : best
+                                        );
+                                        break;
+                                        
+                                    case 'patrol':
+                                        // Patrol - prefer continuing straight, otherwise random
+                                        if (canContinue) {
+                                            nextMove = ghost.lastDirection;
+                                        } else {
+                                            nextMove = movesToConsider[Math.floor(Math.random() * movesToConsider.length)];
+                                        }
+                                        break;
+                                        
+                                    case 'ambush':
+                                        // Ambush - target where player is going
+                                        const targetGridX = player.gridX + player.direction.x * 3;
+                                        const targetGridY = player.gridY + player.direction.y * 3;
+                                        const ambushDist = (dir) => {
+                                            const newGridX = ghost.gridX + dir.x;
+                                            const newGridY = ghost.gridY + dir.y;
+                                            return Math.abs(newGridX - targetGridX) + Math.abs(newGridY - targetGridY);
+                                        };
+                                        nextMove = movesToConsider.reduce((best, current) => 
+                                            ambushDist(current) < ambushDist(best) ? current : best
+                                        );
+                                        break;
+                                        
+                                    case 'shy':
+                                        // Shy - chase when far, retreat when close
+                                        const distToPlayer = Math.abs(ghost.gridX - player.gridX) + Math.abs(ghost.gridY - player.gridY);
+                                        if (distToPlayer < 6) {
+                                            // Too close - retreat
+                                            const retreatDist = (dir) => {
+                                                const newGridX = ghost.gridX + dir.x;
+                                                const newGridY = ghost.gridY + dir.y;
+                                                return Math.abs(newGridX - player.gridX) + Math.abs(newGridY - player.gridY);
+                                            };
+                                            nextMove = movesToConsider.reduce((best, current) => 
+                                                retreatDist(current) > retreatDist(best) ? current : best
+                                            );
+                                        } else {
+                                            // Far enough - chase
+                                            const chaseDist = (dir) => {
+                                                const newGridX = ghost.gridX + dir.x;
+                                                const newGridY = ghost.gridY + dir.y;
+                                                return Math.abs(newGridX - player.gridX) + Math.abs(newGridY - player.gridY);
+                                            };
+                                            nextMove = movesToConsider.reduce((best, current) => 
+                                                chaseDist(current) < chaseDist(best) ? current : best
+                                            );
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (nextMove) {
+                            ghost.direction = nextMove;
+                            ghost.lastDirection = { ...nextMove };
+                            ghost.moving = true;
+                            ghost.moveProgress = 0;
+                            // Store start and target positions
+                            ghost.startX = ghost.gridX * CELL_SIZE;
+                            ghost.startY = ghost.gridY * CELL_SIZE;
+                            const nextGridX = ghost.gridX + nextMove.x;
+                            const nextGridY = ghost.gridY + nextMove.y;
+                            // Handle tunnel effect for target calculation
+                            let targetGridX = nextGridX;
+                            if (targetGridX < 0) targetGridX = COLS - 1;
+                            if (targetGridX >= COLS) targetGridX = 0;
+                            ghost.targetX = targetGridX * CELL_SIZE;
+                            ghost.targetY = nextGridY * CELL_SIZE;
+                        }
+                    }
+                }
+
+                // Always update animation for smooth movement
+                if (ghost.moving) {
+                    ghost.moveProgress += 1;
+                    
+                    if (ghost.moveProgress >= MOVE_SPEED + 2) {
+                        // Complete the move - update grid position
+                        ghost.gridX += ghost.direction.x;
+                        ghost.gridY += ghost.direction.y;
+                        
+                        // Handle tunnel effect
+                        if (ghost.gridX < 0) ghost.gridX = COLS - 1;
+                        if (ghost.gridX >= COLS) ghost.gridX = 0;
+                        
+                        // Set final position
+                        ghost.x = ghost.gridX * CELL_SIZE;
+                        ghost.y = ghost.gridY * CELL_SIZE;
+                        ghost.moving = false;
+                        ghost.moveProgress = 0;
+                    } else {
+                        // Smooth interpolation using stored start and target positions
+                        const progress = ghost.moveProgress / (MOVE_SPEED + 2);
+                        const easedProgress = 0.5 * (1 - Math.cos(progress * Math.PI)); // Smooth sine ease
+                        
+                        ghost.x = ghost.startX + (ghost.targetX - ghost.startX) * easedProgress;
+                        ghost.y = ghost.startY + (ghost.targetY - ghost.startY) * easedProgress;
+                    }
+                }
+            });
+        }
+
+        function checkCollisions() {
+            ghosts.forEach((ghost, index) => {
+                if (ghost.gridX === player.gridX && ghost.gridY === player.gridY) {
+                    if (powerMode) {
+                        // Eat ghost
+                        score += 200;
+                        // Reset ghost to center
+                        ghost.gridX = 9 + (index % 2);
+                        ghost.gridY = 9 + Math.floor(index / 2);
+                        ghost.x = ghost.gridX * CELL_SIZE;
+                        ghost.y = ghost.gridY * CELL_SIZE;
+                        ghost.startX = ghost.x;
+                        ghost.startY = ghost.y;
+                        ghost.targetX = ghost.x;
+                        ghost.targetY = ghost.y;
+                        ghost.moving = false;
+                        ghost.moveProgress = 0;
+                        ghost.commitTimer = 0;
+                        // Reset to initial direction
+                        const initialDirections = [
+                            { x: 1, y: 0 },   // right
+                            { x: -1, y: 0 },  // left  
+                            { x: 0, y: 1 },   // down
+                            { x: 0, y: -1 }   // up
+                        ];
+                        ghost.direction = initialDirections[index];
+                        ghost.lastDirection = { ...initialDirections[index] };
+                    } else {
+                        // Player dies
+                        lives--;
+                        if (lives <= 0) {
+                            gameOver();
+                        } else {
+                            resetPositions();
+                        }
+                    }
+                }
+            });
+        }
+
+        function resetPositions() {
+            player.gridX = 9;
+            player.gridY = 15;
+            player.x = player.gridX * CELL_SIZE;
+            player.y = player.gridY * CELL_SIZE;
+            player.startX = player.x;
+            player.startY = player.y;
+            player.targetX = player.x;
+            player.targetY = player.y;
+            player.direction = { x: 0, y: 0 };
+            player.moving = false;
+            player.moveProgress = 0;
+            
+            ghosts.forEach((ghost, index) => {
+                ghost.gridX = 9 + (index % 2);
+                ghost.gridY = 9 + Math.floor(index / 2);
+                ghost.x = ghost.gridX * CELL_SIZE;
+                ghost.y = ghost.gridY * CELL_SIZE;
+                ghost.startX = ghost.x;
+                ghost.startY = ghost.y;
+                ghost.targetX = ghost.x;
+                ghost.targetY = ghost.y;
+                ghost.moving = false;
+                ghost.moveProgress = 0;
+                ghost.moveTimer = 0;
+                ghost.commitTimer = 0;
+                // Reset to initial directions
+                const initialDirections = [
+                    { x: 1, y: 0 },   // right
+                    { x: -1, y: 0 },  // left  
+                    { x: 0, y: 1 },   // down
+                    { x: 0, y: -1 }   // up
+                ];
+                ghost.direction = initialDirections[index];
+                ghost.lastDirection = { ...initialDirections[index] };
+            });
+        }
+
+        function drawMaze() {
+            ctx.fillStyle = '#004400';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const cellX = x * CELL_SIZE;
+                    const cellY = y * CELL_SIZE;
+
+                    if (maze[y][x] === 1) {
+                        // Draw walls as grid lines
+                        ctx.fillStyle = '#00ff88';
+                        ctx.fillRect(cellX, cellY, CELL_SIZE, CELL_SIZE);
+                        ctx.fillStyle = '#002200';
+                        ctx.fillRect(cellX + 2, cellY + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+                    } else if (maze[y][x] === 2) {
+                        // Draw location pins
+                        ctx.font = `${DOT_SIZE * 2}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText('📍', cellX + CELL_SIZE/2, cellY + CELL_SIZE/2 + DOT_SIZE/2);
+                    } else if (maze[y][x] === 3) {
+                        // Draw survey markers
+                        ctx.font = `${POWER_PELLET_SIZE * 2}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.fillText('🎯', cellX + CELL_SIZE/2, cellY + CELL_SIZE/2 + POWER_PELLET_SIZE/2);
+                    }
+                }
+            }
+        }
+
+        function drawPlayer() {
+            const x = player.x + CELL_SIZE/2;
+            const y = player.y + CELL_SIZE/2;
+            
+            ctx.font = `${PLAYER_SIZE}px Arial`;
+            ctx.textAlign = 'center';
+            
+            if (powerMode) {
+                // Glowing effect during power mode
+                ctx.shadowColor = '#00ff88';
+                ctx.shadowBlur = 10;
+                ctx.fillText('🌍', x, y + PLAYER_SIZE/3);
+                ctx.shadowBlur = 0;
+            } else {
+                ctx.fillText('🌍', x, y + PLAYER_SIZE/3);
+            }
+        }
+
+        function drawGhosts() {
+            ghosts.forEach(ghost => {
+                const x = ghost.x + CELL_SIZE/2;
+                const y = ghost.y + CELL_SIZE/2;
+                
+                ctx.font = `${GHOST_SIZE}px Arial`;
+                ctx.textAlign = 'center';
+                
+                if (powerMode) {
+                    // Scared ghosts
+                    ctx.fillText('💨', x, y + GHOST_SIZE/3);
+                } else {
+                    ctx.fillText(ghost.emoji, x, y + GHOST_SIZE/3);
+                }
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('dots').textContent = `${dotsCollected}/${totalDots}`;
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        function checkWin() {
+            if (dotsCollected >= totalDots) {
+                gameRunning = false;
+                document.getElementById('winScore').textContent = score;
+                document.getElementById('gameWin').style.display = 'block';
+            }
+        }
+
+        function startMission() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            startNewGame();
+            gameLoop();
+        }
+
+        function startNewGame() {
+            // Reset game state
+            score = 0;
+            lives = 3;
+            dotsCollected = 0;
+            powerMode = false;
+            powerModeTimer = 0;
+            gameRunning = true;
+            frameCount = 0;
+            inputDirection = { x: 0, y: 0 };
+            
+            // Reset maze
+            const originalMaze = [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+                [1,3,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,3,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,2,1],
+                [1,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,1],
+                [1,1,1,1,2,1,1,1,0,1,1,0,1,1,1,2,1,1,1,1],
+                [1,1,1,1,2,1,0,0,0,0,0,0,0,0,1,2,1,1,1,1],
+                [1,1,1,1,2,1,0,1,0,0,0,0,1,0,1,2,1,1,1,1],
+                [0,0,0,0,2,0,0,1,0,0,0,0,1,0,0,2,0,0,0,0],
+                [1,1,1,1,2,1,0,1,0,0,0,0,1,0,1,2,1,1,1,1],
+                [1,1,1,1,2,1,0,0,0,0,0,0,0,0,1,2,1,1,1,1],
+                [1,1,1,1,2,1,1,1,0,1,1,0,1,1,1,2,1,1,1,1],
+                [1,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,1],
+                [1,2,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,2,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,3,1,1,2,1,1,1,2,1,1,2,1,1,1,2,1,1,3,1],
+                [1,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,2,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+            
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    maze[y][x] = originalMaze[y][x];
+                }
+            }
+            
+            resetPositions();
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameWin').style.display = 'none';
+        }
+
+        function returnToMenu() {
+            gameRunning = false;
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameWin').style.display = 'none';
+            document.getElementById('introScreen').style.display = 'block';
+        }
+
+        // Game loop
+        function gameLoop() {
+            frameCount++;
+            
+            if (gameRunning) {
+                updatePlayer();
+                updateGhosts();
+                checkCollisions();
+                checkWin();
+                
+                if (powerMode) {
+                    powerModeTimer--;
+                    if (powerModeTimer <= 0) {
+                        powerMode = false;
+                    }
+                }
+            }
+
+            // Render
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMaze();
+            drawPlayer();
+            drawGhosts();
+            updateUI();
+
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+    </script>
+</body>
+</html>
