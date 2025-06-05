@@ -2,6 +2,8 @@
 
 A GIS-themed arcade game where you navigate a coordinate grid to collect location data while avoiding rogue satellites. Built as a modern browser-based twist on classic maze navigation games.
 
+The game is online at [geonavigaor.christophermoravec.com](https://geonavigator.christophermoravec.com/) via github pages from this repo.
+
 ## 🎮 Game Overview
 
 **GeoNavigator** puts you in control of Earth's digital navigation system. Your mission: collect all location data points (📍) scattered across a geographic coordinate grid while avoiding malfunctioning satellites (🛰️) that threaten to disrupt your systems.
